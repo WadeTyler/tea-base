@@ -3,6 +3,7 @@ import db from '../config/db';
 import { clearCookies, comparePasswords, generateUserId, hashPassword, setCookies } from "../lib/util/auth.util";
 import { User } from "../../shared/types/index";
 
+// Create an account for new user
 export const signup = async (req: Request, res: Response): Promise<any> => {
   try {
     const { name, email, password, confirmPassword } = req.body;
@@ -46,6 +47,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
+// Login to an existing account
 export const login = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email, password } = req.body;
@@ -83,6 +85,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
+// Logout of an existing account
 export const logout = async (req: Request, res: Response): Promise<any> => {
   try {
     // clear cookies
@@ -95,6 +98,7 @@ export const logout = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
+// Get user information
 export const getMe = async (req: Request, res: Response): Promise<any> => {
   try {
     const user = req.body.user;
@@ -102,6 +106,23 @@ export const getMe = async (req: Request, res: Response): Promise<any> => {
     return res.status(200).json(user);
   } catch (error) {
     console.error("Error in getMe(): ", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+// Delete user account
+export const deleteUser = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const user = req.body.user;
+    
+    // delete user from database
+    await db.query("DELETE FROM users WHERE user_id = ?", [user.user_id]);
+    // clear the user's auth cookies
+    clearCookies(res);
+
+    return res.status(200).json({ message: "User account deleted." });
+  } catch (error) {
+    console.error("Error in deleteUser(): ", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
