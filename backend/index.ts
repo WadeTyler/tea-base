@@ -1,9 +1,10 @@
-import express, { Express, Request, Response, Application } from 'express';
+import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes';
 dotenv.config();
 
+// middleware
 const app: Application = express();
 app.use(express.json());
 app.use(cookieParser());
