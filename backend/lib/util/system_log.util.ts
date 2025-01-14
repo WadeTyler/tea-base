@@ -25,3 +25,15 @@ export async function createSystemLog({
     throw error;
   }
 }
+
+// delete logs older than 90 days
+export async function deleteOldSystemLogs() {
+  try {
+
+    await db.query("DELETE FROM system_logs WHERE timestamp < DATE_SUB(NOW(), INTERVAL 90 DAY)");
+    console.log("Old system logs deleted");
+
+  } catch (error) {
+    throw error;
+  }
+}

@@ -57,3 +57,10 @@ export interface Review {
   // additional fields for frontend
   name?: string;
 }
+
+export interface SystemLog {
+  system_log_id: number;
+  user_id: string;
+  timestamp: string;
+  log: string;
+}
