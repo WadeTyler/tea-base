@@ -2,6 +2,7 @@ import express from 'express';
 import protectedRoute from '../middleware/protectedRoute';
 import adminRoute from '../middleware/adminRoute';
 import { createProduct, deleteProduct, getAllProducts, getAllProductsInCategory, getFeaturedProducts, getProductById, setImageOrder, setSalePercentage, setStock, toggleFeatured } from '../controllers/product.controller';
+import checkMaintenance from '../middleware/checkMaintenance';
 const router = express.Router();
 
 
