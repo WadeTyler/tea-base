@@ -34,7 +34,8 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
     // set cookies
     await setCookies(res, user_id);
 
-    const user = await db.query("SELECT * FROM users WHERE user_id = ?", [user_id])[0];
+    const [users] = await db.query("SELECT * FROM users WHERE user_id = ?", [user_id]);
+    const user: User = users[0];
     user.password = undefined;
 
     return res.status(201).json({
