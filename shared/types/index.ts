@@ -24,7 +24,11 @@ export interface Product {
   stars: number;
   sales_percentage: number;
   created_at: string;
+
+
+  // Frontend side
   product_images?: ProductImage[];
+  quantity?: number;
 }
 
 export interface ProductImage {
