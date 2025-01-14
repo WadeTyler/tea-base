@@ -18,6 +18,20 @@ export const getAllProducts = async (req: Request, res: Response): Promise<any> 
   }
 }
 
+// get featured products
+export const getFeaturedProducts = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const [products] = await db.query("SELECT * FROM products WHERE is_featured = 1");
+
+    // TODO: Add product images
+
+    return res.status(200).json(products);
+  } catch (error) {
+    console.error("Error in getFeaturedProducts: ", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
 // get products by category
 export const getAllProductsInCategory = async (req: Request, res: Response): Promise<any> => {
   try {

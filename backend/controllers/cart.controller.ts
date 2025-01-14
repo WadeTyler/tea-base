@@ -69,6 +69,8 @@ export const getCartItems = async (req: Request, res: Response): Promise<any> =>
 
     const [cartItems]: Product[] = await db.query("SELECT products.*, cart_items.quantity FROM cart_items JOIN products ON cart_items.product_id = products.product_id WHERE cart_items.user_id = ?", [user.user_id]);
 
+    // TODO: Add product images
+
     return res.status(200).json(cartItems);
   } catch (error) {
     console.error("Error in getCartItems: ", error);
