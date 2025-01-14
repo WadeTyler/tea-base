@@ -35,7 +35,7 @@ export interface ProductImage {
   product_image_id: number;
   product_id: string;
   image: string;
-  order: number;
+  image_order: number;
 }
 
 export interface Coupon {

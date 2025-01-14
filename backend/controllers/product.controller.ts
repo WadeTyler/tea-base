@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import db from '../config/db';
 import { generateProductId } from "../lib/util/product.util";
+import cloudinary from "../lib/cloudinary";
+import { ProductImage } from "../../shared/types";
 
 
 // get all products
@@ -8,7 +10,11 @@ export const getAllProducts = async (req: Request, res: Response): Promise<any> 
   try {
     const [products] = await db.query("SELECT * FROM products");
 
-    // TODO: Add product images
+    // Add product images
+    for (let i = 0; i < products.length; i++) {
+      const [product_images]: ProductImage[] = await db.query("SELECT * FROM product_images WHERE product_id = ? ORDER BY image_order ASC", [products[i].product_id]);
+      products[i].product_images = product_images;
+    }
 
     return res.status(200).json(products);
 
@@ -23,7 +29,11 @@ export const getFeaturedProducts = async (req: Request, res: Response): Promise<
   try {
     const [products] = await db.query("SELECT * FROM products WHERE is_featured = 1");
 
-    // TODO: Add product images
+    // Add product images
+    for (let i = 0; i < products.length; i++) {
+      const [product_images]: ProductImage[] = await db.query("SELECT * FROM product_images WHERE product_id = ? ORDER BY image_order ASC", [products[i].product_id]);
+      products[i].product_images = product_images;
+    }
 
     return res.status(200).json(products);
   } catch (error) {
@@ -49,6 +59,13 @@ export const getAllProductsInCategory = async (req: Request, res: Response): Pro
 
     const [products] = await db.query("SELECT * FROM products WHERE category_id = ?", [category_id]);
 
+
+    // add product images
+    for (let i = 0; i < products.length; i++) {
+      const [product_images]: ProductImage[] = await db.query("SELECT * FROM product_images WHERE product_id = ? ORDER BY image_order ASC", [products[i].product_id]);
+      products[i].product_images = product_images;
+    }
+
     return res.status(200).json(products);
   } catch (error) {
     console.error("Error in getAllProductsInCategory: ", error);
@@ -71,7 +88,9 @@ export const getProductById = async (req: Request, res: Response): Promise<any> 
       return res.status(404).json({ message: "Product does not exist" });
     }
 
-    // TODO: Add product images
+    // Add product images
+    const [product_images]: ProductImage[] = await db.query("SELECT * FROM product_images WHERE product_id = ? ORDER BY image_order ASC", [product_id]);
+    product[0].product_images = product_images;
 
     return res.status(200).json(product[0]);
 
@@ -89,17 +108,20 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
     
     const { name, category_id, price, stock, description, images } = req.body;
 
-    if (!name || !category_id || price === null || stock === null || !description /* || !images */) {
+    if (!name || !category_id || price === null || stock === null || !description) {
       return res.status(400).json({ message: "All fields are required." });
+    }
+
+    // at least one image is required.
+    if (images.length === 0) {
+      return res.status(400).json({ message: "At least one image is required." });
     }
 
     // check if product already exists
     const [existingProduct] = await db.query("SELECT * FROM products WHERE LOWER(name) = LOWER(?)", [name]);
     if (existingProduct.length > 0) {
-      return res.status(400).json({ message: "Product already exists" });
+      return res.status(400).json({ message: "Product with that name already exists" });
     }
-
-    // TODO: Add image upload functionality
 
     if (price < 0) {
       return res.status(400).json({ message: "Price cannot be negative" });
@@ -126,6 +148,28 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
     await db.query("INSERT INTO products (product_id, category_id, name, price, stock, description) VALUES (?, ?, ?, ?, ?, ?)", [product_id, category_id, name, price, stock, description]);
 
     const [newProduct] = await db.query("SELECT * FROM products WHERE product_id = ?", [product_id]);
+
+    // Add product images
+    let cloudinaryResponse = null;
+    let product_images: ProductImage[] = [];
+
+    for (let i = 0; i < images.length; i++) {
+      cloudinaryResponse = await cloudinary.uploader.upload(images[i], { folder: "products" });
+
+      // add image to db
+      const [productImage] = await db.query("INSERT INTO product_images (product_id, image, image_order) VALUES(?, ?, ?)", [product_id, cloudinaryResponse.secure_url, i]);
+
+      const newImage: ProductImage = {
+        product_image_id: productImage.insertId,
+        product_id,
+        image: cloudinaryResponse.secure_url,
+        image_order: i
+      };
+
+      product_images.push(newImage);
+    }
+
+    newProduct[0].product_images = product_images;
 
     // TODO: Add system log
 
@@ -186,7 +230,19 @@ export const deleteProduct = async (req: Request, res: Response): Promise<any> =
       return res.status(404).json({ message: "Product does not exist" });
     }
 
+    // delete product images from cloudinary
+    const [product_images] = await db.query("SELECT * FROM product_images WHERE product_id = ?", [product_id]);
+    for (let i = 0; i < product_images.length; i++) {
+      const publicId = product_images[i].image.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(`products/${publicId}`);
+    }
+
+    // delete from db
     await db.query("DELETE FROM products WHERE product_id = ?", [product_id]);
+
+    // product_images should cascade on delete, so no need to manually delete.
+    
+
 
     // TODO: Add system log
 

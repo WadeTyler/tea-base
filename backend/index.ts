@@ -13,7 +13,9 @@ dotenv.config();
 
 // middleware
 const app: Application = express();
-app.use(express.json());
+app.use(express.json({
+  limit: "10mb"
+}));
 app.use(cookieParser());
 
 // Routes
