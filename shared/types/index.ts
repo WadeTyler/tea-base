@@ -6,3 +6,9 @@ export interface User {
   role: string;
   created_at: string;
 }
+
+export interface Category {
+  category_id: string;
+  name: string;
+  label: string;
+}

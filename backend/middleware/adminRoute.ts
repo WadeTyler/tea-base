@@ -21,3 +21,5 @@ const adminRoute = async (req: Request, res: Response, next: NextFunction): Prom
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export default adminRoute;
