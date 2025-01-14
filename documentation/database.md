@@ -14,6 +14,7 @@
 ```
 
 ### categories
+```
 +-------------+-------------+------+-----+---------+----------------+
 | Field       | Type        | Null | Key | Default | Extra          |
 +-------------+-------------+------+-----+---------+----------------+
@@ -21,3 +22,22 @@
 | name        | varchar(50) | NO   |     | NULL    |                |
 | label       | varchar(50) | YES  |     | NULL    |                |
 +-------------+-------------+------+-----+---------+----------------+
+```
+
+### products
+```
++------------------+--------------+------+-----+-------------------+-------------------+
+| Field            | Type         | Null | Key | Default           | Extra             |
++------------------+--------------+------+-----+-------------------+-------------------+
+| product_id       | varchar(512) | NO   | PRI | NULL              |                   |
+| category_id      | int          | YES  | MUL | NULL              |                   |
+| name             | varchar(255) | NO   |     | NULL              |                   |
+| price            | double       | NO   |     | 0                 |                   |
+| stock            | int          | YES  |     | 0                 |                   |
+| description      | text         | YES  |     | NULL              |                   |
+| is_featured      | tinyint(1)   | YES  |     | 0                 |                   |
+| stars            | float        | YES  |     | NULL              |                   |
+| sales_percentage | int          | YES  |     | 0                 |                   |
+| created_at       | timestamp    | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++------------------+--------------+------+-----+-------------------+-------------------+
+```

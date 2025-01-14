@@ -8,7 +8,28 @@ export interface User {
 }
 
 export interface Category {
-  category_id: string;
+  category_id: number;
   name: string;
   label: string;
+}
+
+export interface Product {
+  product_id: string;
+  category_id: number;
+  name: string;
+  price: number;
+  stock: number;
+  description: string;
+  is_featured: boolean;
+  stars: number;
+  sales_percentage: number;
+  created_at: string;
+  product_images?: ProductImage[];
+}
+
+export interface ProductImage {
+  product_image_id: number;
+  product_id: string;
+  image: string;
+  order: number;
 }
