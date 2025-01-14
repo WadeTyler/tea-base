@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes';
 import categoryRoutes from './routes/category.routes';
 import productRoutes from './routes/product.routes';
+import couponRoutes from './routes/coupon.routes';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/coupons", couponRoutes);
 
 const port = process.env.PORT || 8000;
 app.listen(port, () => {

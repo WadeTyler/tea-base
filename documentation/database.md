@@ -41,3 +41,15 @@
 | created_at       | timestamp    | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
 +------------------+--------------+------+-----+-------------------+-------------------+
 ```
+
+### coupons
+```
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| coupon_id  | varchar(50) | NO   | PRI | NULL    |       |
+| discount   | int         | NO   |     | NULL    |       |
+| expiration | date        | NO   |     | NULL    |       |
+| is_active  | tinyint     | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+```

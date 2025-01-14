@@ -75,7 +75,7 @@ const protectedRoute = async (req: Request, res: Response, next: NextFunction): 
 
       // we have token, verify it has user_id
       if (typeof decoded !== 'string' && decoded.user_id) {
-        console.log("Here is the decoded object: ", decoded);
+        // console.log("Here is the decoded object: ", decoded);
         // add user to req body
         const [users] = await db.query("SELECT * FROM users WHERE user_id = ?", [decoded.user_id]);
         if (!users || users.length === 0) {
@@ -86,7 +86,7 @@ const protectedRoute = async (req: Request, res: Response, next: NextFunction): 
 
         const user = users[0];
 
-        console.log("Here is the user: ", user);
+        // console.log("Here is the user: ", user);
 
         user.password = undefined;
         req.body.user = user;

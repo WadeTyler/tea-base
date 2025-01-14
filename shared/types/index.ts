@@ -33,3 +33,10 @@ export interface ProductImage {
   image: string;
   order: number;
 }
+
+export interface Coupon {
+  coupon_id: string;
+  discount: number;
+  expiration: string;
+  is_active: boolean;
+}
