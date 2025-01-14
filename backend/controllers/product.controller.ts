@@ -324,3 +324,44 @@ export const setStock = async (req: Request, res: Response): Promise<any> => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+// set the product_image order
+export const setImageOrder = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { product_id } = req.params;
+    const { product_images } = req.body;
+
+    if (!product_id || !product_images) {
+      return res.status(400).json({ message: "Product ID and product_images are required" });
+    }
+
+    // Check product exists
+    const [product] = await db.query("SELECT * FROM products WHERE product_id = ?", [product_id]);
+    if (product.length === 0) {
+      return res.status(404).json({ message: "Product does not exist" });
+    }
+
+    // Check if all images belong to the product
+    for (let i = 0; i < product_images.length; i++) {
+      const [image] = await db.query("SELECT * FROM product_images WHERE product_image_id = ? AND product_id = ?", [product_images[i].product_image_id, product_id]);
+      if (image.length === 0) {
+        return res.status(404).json({ message: "Image does not belong to the product" });
+      }
+    }
+
+    // update image order. order is determined based on the arrangement in the array.
+    for (let i = 0; i < product_images.length; i++) {
+      await db.query("UPDATE product_images SET image_order = ? WHERE product_image_id = ?", [i, product_images[i].product_image_id]);
+      product_images[i].image_order = i;
+    }
+
+    return res.status(200).json({ 
+      message: "Image order updated",
+      product_images
+    });
+
+  } catch (error) {
+    console.error("Error in setImageOrder: ", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
