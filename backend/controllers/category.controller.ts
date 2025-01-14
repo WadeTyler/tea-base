@@ -1,6 +1,7 @@
 
 import { Request, Response } from 'express';
-import db from '../config/db';
+import db from '../lib/db';
+import { createSystemLog } from '../lib/util/system_log.util';
 
 export const getAllCategories = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -32,6 +33,15 @@ export const createCategory = async (req: Request, res: Response): Promise<any> 
     // return the category
     const [newCategory] = await db.query("SELECT * FROM categories WHERE LOWER(name) = LOWER(?)", [name]);
 
+
+    // add system log
+    const user = req.body.user;
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} created a new category: ${name}`
+    });
+
+    
     return res.status(201).json({
       message: "Category created successfully",
       category: newCategory[0]
@@ -55,6 +65,13 @@ export const deleteCategory = async (req: Request, res: Response): Promise<any> 
 
     // delete category
     await db.query("DELETE FROM categories WHERE category_id = ?", [category_id]);
+
+    // add system log
+    const user = req.body.user;
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} deleted a category: ${existingCategory.name}`
+    });
 
     return res.status(200).json({ message: "Category deleted successfully" });
 
@@ -88,6 +105,13 @@ export const updateCategory = async (req: Request, res: Response): Promise<any> 
 
     // return the updated category
     const [updatedCategory] = await db.query("SELECT * FROM categories WHERE category_id = ?", [category_id]);
+
+    // add system log
+    const user = req.body.user;
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} updated a category: ${category_id}. New name: ${newFields.name}, New label: ${newFields.label}`
+    });
 
     return res.status(200).json({
       message: "Category updated successfully",

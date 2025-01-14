@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import db from '../config/db';
+import db from '../lib/db';
 import { Coupon } from "../../shared/types";
+import { createSystemLog } from "../lib/util/system_log.util";
 
 
 
@@ -89,7 +90,6 @@ export const createCoupon = async (req: Request, res: Response): Promise<any> =>
     // Create the coupon
     await db.query("INSERT INTO coupons (coupon_id, discount, expiration, is_active) VALUES(?, ?, ?, ?)", [coupon_id, discount, expiration, is_active]);
 
-    // TODO: Add system log
 
     const coupon: Coupon = {
       coupon_id,
@@ -97,6 +97,13 @@ export const createCoupon = async (req: Request, res: Response): Promise<any> =>
       expiration,
       is_active
     };
+
+    // add system log
+    const user = req.body.user;
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} created a new coupon: ${coupon_id} with the discount of ${discount}%`
+    });
 
     return res.status(201).json({ 
       message: "Coupon created successfully", 
@@ -165,7 +172,12 @@ export const updateCoupon = async (req: Request, res: Response): Promise<any> =>
     // Update the coupon
     await db.query("UPDATE coupons SET discount = ?, expiration = ?, is_active = ? WHERE coupon_id = ?", [newFields.discount, newFields.expiration, newFields.is_active, coupon_id]);
 
-    // TODO: Add system log
+    // add system log
+    const user = req.body.user;
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} updated a coupon: ${coupon_id}. New discount: ${newFields.discount}%, New expiration: ${newFields.expiration}, New is_active: ${newFields.is_active}`
+    });
 
     return res.status(200).json({
       message: "Coupon updated successfully",
@@ -195,7 +207,12 @@ export const deleteCoupon = async (req: Request, res: Response): Promise<any> =>
     // Delete the coupon
     await db.query("DELETE FROM coupons WHERE coupon_id = ?", [coupon_id]);
 
-    // TODO: Add system log
+    // add system log
+    const user = req.body.user;
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} deleted a coupon: ${coupon_id}`
+    });
 
     return res.status(200).json({ message: `Coupon '${coupon_id}' deleted successfully` });
   } catch (error) {

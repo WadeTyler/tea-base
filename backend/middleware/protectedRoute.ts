@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { clearCookies, decodeAccessToken, decodeRefreshToken, generateAccessToken, setCookies } from "../lib/util/auth.util";
-import db from '../config/db';
+import db from '../lib/db';
 
 
 const protectedRoute = async (req: Request, res: Response, next: NextFunction): Promise<any> => {

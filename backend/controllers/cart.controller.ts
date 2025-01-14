@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import db from '../config/db';
+import db from '../lib/db';
 import { Product } from "../../shared/types";
 
 export const addToCart = async (req: Request, res: Response): Promise<any> => {

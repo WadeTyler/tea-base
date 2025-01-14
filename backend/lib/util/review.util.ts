@@ -1,4 +1,4 @@
-import db from '../../config/db';
+import db from '../db';
 
 
 export async function updateProductStars(product_id: string) {

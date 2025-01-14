@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import db from '../config/db';
+import db from '../lib/db';
 import { generateProductId } from "../lib/util/product.util";
 import cloudinary from "../lib/cloudinary";
 import { ProductImage } from "../../shared/types";
+import { createSystemLog } from "../lib/util/system_log.util";
 
 
 // get all products
@@ -100,13 +101,14 @@ export const getProductById = async (req: Request, res: Response): Promise<any> 
   }
 }
 
+// TODO: get best selling products
+
 /////////////////////////////////////// ADMIN ONLY ///////////////////////////////////////
 
 // create product
 export const createProduct = async (req: Request, res: Response): Promise<any> => {
   try {
-    
-    const { name, category_id, price, stock, description, images } = req.body;
+    const { user, name, category_id, price, stock, description, images } = req.body;
 
     if (!name || !category_id || price === null || stock === null || !description) {
       return res.status(400).json({ message: "All fields are required." });
@@ -171,7 +173,11 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
 
     newProduct[0].product_images = product_images;
 
-    // TODO: Add system log
+    // Add system log
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} created a new product: ${name}`
+    });
 
     return res.status(201).json({
       message: "Product created successfully",
@@ -187,6 +193,7 @@ export const createProduct = async (req: Request, res: Response): Promise<any> =
 // toggle featured
 export const toggleFeatured = async (req: Request, res: Response): Promise<any> => {
   try {
+    const user = req.body.user;
     const { product_id } = req.params;
 
     if (!product_id) {
@@ -203,6 +210,13 @@ export const toggleFeatured = async (req: Request, res: Response): Promise<any> 
 
     await db.query("UPDATE products SET is_featured = ? WHERE product_id = ?", [is_featured, product_id]);
 
+
+    // Add system log
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} ${is_featured ? "featured" : "unfeatured"} product: ${product[0].name}`
+    });
+
     return res.status(200).json({
       message: "Product featured status updated",
       product_id,
@@ -218,6 +232,7 @@ export const toggleFeatured = async (req: Request, res: Response): Promise<any> 
 // delete target product
 export const deleteProduct = async (req: Request, res: Response): Promise<any> => {
   try {
+    const user = req.body.user;
     const { product_id } = req.params;
 
     if (!product_id) {
@@ -244,7 +259,11 @@ export const deleteProduct = async (req: Request, res: Response): Promise<any> =
     
 
 
-    // TODO: Add system log
+    // Add system log
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} deleted product: ${product[0].name}`
+    });
 
     return res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
@@ -256,6 +275,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<any> =
 // set sale percentage
 export const setSalePercentage = async (req: Request, res: Response): Promise<any> => {
   try {
+    const user = req.body.user;
     const { product_id } = req.params;
     const { sales_percentage } = req.body;
 
@@ -275,7 +295,11 @@ export const setSalePercentage = async (req: Request, res: Response): Promise<an
     await db.query("UPDATE products SET sales_percentage = ? WHERE product_id = ?", [sales_percentage, product_id]);
 
 
-    // TODO: Add system log
+    // Add system log
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} set the sale percentage to ${sales_percentage}% for product: ${product[0].name}`
+    });
 
 
     return res.status(200).json({
@@ -293,6 +317,7 @@ export const setSalePercentage = async (req: Request, res: Response): Promise<an
 // set stock
 export const setStock = async (req: Request, res: Response): Promise<any> => {
   try {
+    const user = req.body.user;
     const { product_id } = req.params;
     const { stock } = req.body;
 
@@ -312,7 +337,11 @@ export const setStock = async (req: Request, res: Response): Promise<any> => {
 
     await db.query("UPDATE products SET stock = ? WHERE product_id = ?", [stock, product_id]);
 
-    // TODO: Add system log
+    // Add system log
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} set the stock to ${stock} for product: ${product[0].name}`
+    });
 
     return res.status(200).json({
       message: "Stock updated to " + stock,
@@ -328,6 +357,7 @@ export const setStock = async (req: Request, res: Response): Promise<any> => {
 // set the product_image order
 export const setImageOrder = async (req: Request, res: Response): Promise<any> => {
   try {
+    const user = req.body.user;
     const { product_id } = req.params;
     const { product_images } = req.body;
 
@@ -354,6 +384,12 @@ export const setImageOrder = async (req: Request, res: Response): Promise<any> =
       await db.query("UPDATE product_images SET image_order = ? WHERE product_image_id = ?", [i, product_images[i].product_image_id]);
       product_images[i].image_order = i;
     }
+
+    // Add system log
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} changed the image order for a product: ${product[0].name}`
+    });
 
     return res.status(200).json({ 
       message: "Image order updated",

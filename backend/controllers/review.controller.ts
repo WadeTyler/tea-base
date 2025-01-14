@@ -1,8 +1,9 @@
 
 import { Request, Response } from 'express';
-import db from '../config/db';
+import db from '../lib/db';
 import { Review } from '../../shared/types';
 import { updateProductStars } from '../lib/util/review.util';
+import { createSystemLog } from '../lib/util/system_log.util';
 
 export const getReviewsByProduct = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -112,6 +113,7 @@ export const deleteReview = async (req: Request, res: Response): Promise<any> =>
 ////////////////// Admin Routes //////////////////
 export const deleteReviewByAdmin = async (req: Request, res: Response): Promise<any> => {
   try {
+    const user = req.body.user;
     const { review_id } = req.params;
     
     if (!review_id) {
@@ -128,6 +130,11 @@ export const deleteReviewByAdmin = async (req: Request, res: Response): Promise<
 
     // Update product stars
     await updateProductStars(reviews[0].product_id);
+
+    createSystemLog({
+      user_id: user.user_id,
+      log: `${user.name} deleted a review on the product: ${reviews[0].product_id}`
+    });
 
     return res.status(200).json({ message: "Review deleted successfully" });
 

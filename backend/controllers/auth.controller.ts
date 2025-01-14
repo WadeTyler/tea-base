@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import db from '../config/db';
+import db from '../lib/db';
 import { clearCookies, comparePasswords, generateUserId, hashPassword, setCookies } from "../lib/util/auth.util";
 import { User } from "../../shared/types/index";
 
