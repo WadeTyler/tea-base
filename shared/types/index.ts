@@ -40,3 +40,16 @@ export interface Coupon {
   expiration: string;
   is_active: boolean;
 }
+
+export interface Review {
+  review_id: string;
+  product_id: string;
+  user_id: string;
+  timestamp: string;
+  rating: number;
+  summary: string;
+  content: string;
+
+  // additional fields for frontend
+  name?: string;
+}

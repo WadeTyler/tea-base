@@ -1,9 +1,10 @@
 import express from 'express';
 import protectedRoute from '../middleware/protectedRoute';
 import adminRoute from '../middleware/adminRoute';
-import { createCoupon, deleteCoupon, getAllCoupons, updateCoupon } from '../controllers/coupon.controller';
+import { createCoupon, deleteCoupon, getAllCoupons, updateCoupon, verifyCoupon } from '../controllers/coupon.controller';
 const router = express.Router();
 
+router.get("/:coupon_id/verify", protectedRoute, verifyCoupon);
 
 // Admin Routes
 router.post("/", protectedRoute, adminRoute, createCoupon);

@@ -53,3 +53,18 @@
 | is_active  | tinyint     | YES  |     | NULL    |       |
 +------------+-------------+------+-----+---------+-------+
 ```
+
+### reviews
+```
++------------+--------------+------+-----+-------------------+-------------------+
+| Field      | Type         | Null | Key | Default           | Extra             |
++------------+--------------+------+-----+-------------------+-------------------+
+| review_id  | int          | NO   | PRI | NULL              | auto_increment    |
+| product_id | varchar(512) | NO   | MUL | NULL              |                   |
+| user_id    | varchar(512) | NO   | MUL | NULL              |                   |
+| timestamp  | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| rating     | tinyint      | YES  |     | 5                 |                   |
+| summary    | varchar(50)  | YES  |     | NULL              |                   |
+| content    | varchar(300) | YES  |     | NULL              |                   |
++------------+--------------+------+-----+-------------------+-------------------+
+```

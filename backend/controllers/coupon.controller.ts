@@ -5,6 +5,48 @@ import { Coupon } from "../../shared/types";
 
 
 
+export const verifyCoupon = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { coupon_id } = req.params;
+
+    if (!coupon_id) {
+      return res.status(400).json({ message: "Please provide a coupon_id" });
+    }
+
+    // Check if the coupon exists
+    const [existingCoupon] = await db.query("SELECT * FROM coupons WHERE coupon_id = ?", [coupon_id]);
+    if (existingCoupon.length === 0) {
+      return res.status(404).json({ message: "Coupon invalid or expired." });
+    }
+
+    const coupon: Coupon = existingCoupon[0];
+
+    // check active status
+    if (!coupon.is_active) {
+      return res.status(400).json({ message: "Coupon is invalid or expired." });
+    }
+
+    // Check expiration date
+    const expirationDate = new Date(coupon.expiration);
+    if (expirationDate < new Date()) {
+      // update is_active to false
+      await db.query("UPDATE coupons SET is_active = 0 WHERE coupon_id = ?", [coupon_id]);
+      return res.status(400).json({ message: "Coupon is invalid or expired." });
+    }
+
+    return res.status(200).json({
+      message: "Coupon is active and verified.",
+      coupon
+    });
+
+
+
+
+  } catch (error) {
+    console.error("Error in verifyCoupon: ", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
 
 ////////////////// Admin Routes //////////////////////
 
