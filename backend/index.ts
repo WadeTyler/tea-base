@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 // Routes
 import authRoutes from './routes/auth.routes';
@@ -18,11 +19,17 @@ dotenv.config();;
 var maintenace = false;
 
 // Middleware
+
 const app: Application = express();
 app.use(express.json({
   limit: "10mb"
 }));
 app.use(cookieParser());
+
+app.use(cors({
+  credentials: true,
+  origin: "*"
+}));
 
 // Routes
 app.use("/api/auth", authRoutes);
