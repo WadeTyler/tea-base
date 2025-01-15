@@ -28,6 +28,10 @@ export const addToCart = async (req: Request, res: Response): Promise<any> => {
       return res.status(404).json({ message: "Product not found" });
     }
 
+    if (quantity > product[0].stock) {
+      return res.status(400).json({ message: "Quantity too high." });
+    }
+
     // Check if the product is already in the cart
     const [existingCartItem] = await db.query("SELECT * FROM cart_items WHERE product_id = ? AND user_id = ?", [product_id, user.user_id]);
 
@@ -88,6 +92,15 @@ export const updateQuantity = async (req: Request, res: Response): Promise<any> 
 
     if (quantity < 0) {
       return res.status(400).json({ message: "Quantity must be greater than or equal to 0" });
+    }
+
+    const [product] = await db.query("SELECT * FROM products WHERE product_id = ?", [product_id]);
+    if (product.length === 0) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (quantity > product[0].stock) {
+      return res.status(400).json({ message: "Quantity too high." });
     }
     
     const [cart_item] = await db.query("SELECT * FROM cart_items WHERE user_id = ? AND product_id = ?", [user.user_id, product_id]);

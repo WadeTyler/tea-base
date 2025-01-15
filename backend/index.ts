@@ -12,6 +12,7 @@ import reviewRoutes from './routes/review.routes';
 import cartRoutes from './routes/cart.routes';
 import systemLogRoutes from './routes/system_log.routes';
 import maintenanceRoutes from './routes/maintenance.routes';
+import checkoutRoutes from './routes/checkout.routes';
 
 dotenv.config();;
 
@@ -40,6 +41,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/system-logs", systemLogRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
+app.use("/api/checkout", checkoutRoutes);
 
 // UTIL FUNCTIONS
 export const toggleMaintenance = () => {

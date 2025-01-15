@@ -28,6 +28,7 @@ export interface Product {
 
   // Frontend side
   product_images?: ProductImage[];
+  image?: string;
   quantity?: number;
 }
 
@@ -63,4 +64,17 @@ export interface SystemLog {
   user_id: string;
   timestamp: string;
   log: string;
+}
+
+
+export interface LineItem {
+  price_data: {
+    currency: string;
+    product_data: {
+      name: string;
+      images: string[];
+    },
+    unit_amount: number,
+  },
+  quantity: number,
 }
