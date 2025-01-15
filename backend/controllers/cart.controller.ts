@@ -71,9 +71,13 @@ export const getCartItems = async (req: Request, res: Response): Promise<any> =>
   try {
     const { user } = req.body;
 
-    const [cartItems]: Product[] = await db.query("SELECT products.*, cart_items.quantity FROM cart_items JOIN products ON cart_items.product_id = products.product_id WHERE cart_items.user_id = ?", [user.user_id]);
+    const [cartItems] = await db.query("SELECT products.*, cart_items.quantity FROM cart_items JOIN products ON cart_items.product_id = products.product_id WHERE cart_items.user_id = ?", [user.user_id]);
 
-    // TODO: Add product images
+    // Add product images
+    for (let i = 0; i < cartItems.length; i++) {
+      const [proudct_images] = await db.query("SELECT * FROM product_images WHERE product_id = ? ORDER BY image_order DESC", [cartItems[i].product_id]);
+      cartItems[i].product_images = proudct_images;
+    }
 
     return res.status(200).json(cartItems);
   } catch (error) {
